@@ -1,0 +1,25 @@
+name: GameZones
+version: '${version}'
+main: ru.olejka.gamezonesplugin.GameZones
+api-version: '1.20'
+prefix: OCGZ
+authors: [Olejka]
+description: Plugin for game zones
+website: https://olejka.ru/
+commands:
+  gz-wand:
+    description: 'Use wand to create game zone'
+    usage: '/gz-wand'
+    permission: ocgz.wand
+  gz-save:
+    description: 'Save selected game zone'
+    usage: '/gz-save [green/red]'
+    permission: ocgz.zones
+  gz-delete:
+    description: 'Delete zone in which you are'
+    usage: '/gz-delete'
+    permission: ocgz.zones
+  gz-reload:
+    description: 'Reloads plugin config'
+    usage: '/gz-reload'
+    permission: ocgz.reload

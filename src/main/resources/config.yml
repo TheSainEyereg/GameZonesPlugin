@@ -1,0 +1,26 @@
+translation:
+  players-only: "§cOnly players can use this command"
+  no-permission: "§cYou don't have permission to use this command"
+  select-no-selection: "§cSelect two points first"
+  select-two-points: "§cSelection of two points is needed"
+  select-two-different-points: "§cTwo points are the same. Please select two different points"
+  select-overlap-green: "§cThere is already a green zone here"
+  select-overlap-red: "§cThere is already a red zone here"
+  wrong-type: "§cWrong type of zone (green/red)"
+  selected-first: "§6First point selected at"
+  selected-second: "§6First point selected at"
+  created-green: "§aGreen zone created"
+  created-red: "§aRed zone created"
+  entered-green: "§aYou have entered the green zone"
+  entered-red: "§cYou have entered the red zone"
+  left-green: "§6You have left green zone"
+  left-red: "§6You have left red zone"
+  not-in-zone: "§cYou're currently not in any zone"
+  deleted: "§6Zone has been deleted"
+  list: "§6List of zones:"
+  reloaded: "§aConfiguration reloaded"
+
+# Zone saved coordinates DO NOT EDIT MANUALLY
+zones:
+  green: []
+  red: []
