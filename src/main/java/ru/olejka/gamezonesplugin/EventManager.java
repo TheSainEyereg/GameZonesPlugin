@@ -6,10 +6,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.logging.Logger;
 
@@ -21,7 +26,8 @@ public class EventManager implements Listener {
 	public void onEntityExplode(EntityExplodeEvent event) {
 		for (var zone : ConfigManager.getGreenZones()) {
 			if (zone.contains(event.getLocation().getBlockX(), event.getLocation().getBlockZ())) {
-				event.setCancelled(true);
+//				event.setCancelled(true);
+				event.blockList().clear();
 			}
 		}
 	}
@@ -31,24 +37,82 @@ public class EventManager implements Listener {
 	public void onBlockExplode(BlockExplodeEvent event) {
 		for (var zone : ConfigManager.getGreenZones()) {
 			if (zone.contains(event.getBlock().getX(), event.getBlock().getZ())) {
-				event.setCancelled(true);
+//				event.setCancelled(true);
+				event.blockList().clear();
 			}
 		}
 	}
 
-	//Cancel damage only to players in green zones
+	//Cancel burning damage only to players in green zones
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+	public void onEntityDamageByBlock(EntityDamageEvent event) {
 		if (event.getEntity() instanceof Player) {
 			var player = (Player) event.getEntity();
+			var cause = event.getCause();
 			var location = player.getLocation();
 
-//			logger.info(event.getDamager().getType() + " attacked " + event.getEntity().getType());
+			if (cause != EntityDamageEvent.DamageCause.FIRE && cause != EntityDamageEvent.DamageCause.FIRE_TICK && cause != EntityDamageEvent.DamageCause.LAVA)
+				return;
 
 			for (var zone : ConfigManager.getGreenZones()) {
 				if (zone.contains(location.getBlockX(), location.getBlockZ())) {
 					event.setCancelled(true);
 				}
+			}
+		}
+	}
+
+	// Limit fire spread in green zone
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onFireSpread(BlockSpreadEvent event) {
+		var block = event.getSource();
+		for (var zone : ConfigManager.getGreenZones()) {
+			if (zone.contains(block.getX(), block.getZ())) {
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	// Limit block burn in green zone
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void blockBurn(BlockBurnEvent event) {
+		var block = event.getBlock();
+		for (var zone : ConfigManager.getGreenZones()) {
+			if (zone.contains(block.getX(), block.getZ())) {
+				event.setCancelled(true);
+			}
+		}
+	}
+
+	// Limit player's elytra speed in red zone
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onPlayerMove(PlayerMoveEvent event) {
+		var player = event.getPlayer();
+		if (player.isGliding()) {
+			var location = player.getLocation();
+			for (var zone : ConfigManager.getRedZones()) {
+				if (zone.contains(location.getBlockX(), location.getBlockZ())) {
+					var velocity = player.getVelocity();
+
+					player.setVelocity(velocity.multiply(0.9f));
+				}
+			}
+		}
+	}
+
+	// Fireworks use in red zone
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onElytaFireworks(PlayerInteractEvent event) {
+		var player = event.getPlayer();
+		var item = event.getItem();
+		var position = player.getLocation();
+
+		if (!player.isGliding() || item == null || item.getType() != Material.FIREWORK_ROCKET)
+			return;
+
+		for (var zone : ConfigManager.getRedZones()) {
+			if (zone.contains(position.getBlockX(), position.getBlockZ())) {
+				event.setCancelled(true);
 			}
 		}
 	}

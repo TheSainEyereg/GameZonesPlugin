@@ -3,6 +3,7 @@ package ru.olejka.gamezonesplugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
@@ -32,6 +33,12 @@ public class PlayerNotifier {
 					for (var zone : ConfigManager.getRedZones()) {
 						if (zone.contains(location.getBlockX(), location.getBlockZ())) {
 							notInZone = false;
+
+							// if hase invisibility take it
+							if (p.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+								p.removePotionEffect(PotionEffectType.INVISIBILITY);
+							}
+
 							if (!notified.equals(NotifiedType.ENTERED_RED)) {
 								spigot.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ConfigManager.getTranslation("entered-red")));
 								notifications.put(p.getName(), NotifiedType.ENTERED_RED);
