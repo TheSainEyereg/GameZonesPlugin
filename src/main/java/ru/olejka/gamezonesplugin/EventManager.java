@@ -1,18 +1,13 @@
 package ru.olejka.gamezonesplugin;
 
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockExplodeEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -83,6 +78,20 @@ public class EventManager implements Listener {
 		for (var zone : ConfigManager.getGreenZones()) {
 			if (zone.contains(block.getX(), block.getZ(), block.getWorld().getEnvironment())) {
 				event.setCancelled(true);
+			}
+		}
+	}
+
+	// Prevent wither from breaking block in green zone
+	@EventHandler
+	public void onBlockChange(EntityChangeBlockEvent event) {
+		var block = event.getBlock();
+		var entity = event.getEntity();
+		if (entity.getType().equals(EntityType.WITHER)) {
+			for (var zone : ConfigManager.getGreenZones()) {
+				if (zone.contains(block.getX(), block.getZ(), block.getWorld().getEnvironment())) {
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
