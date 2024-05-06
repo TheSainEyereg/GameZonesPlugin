@@ -26,12 +26,13 @@ public class PlayerNotifier {
 			public void run() {
 				for(var p : Bukkit.getOnlinePlayers()) {
 					var location = p.getLocation();
+					var world = p.getWorld().getEnvironment();
 					var spigot = p.spigot();
 					var notified = notifications.getOrDefault(p.getName(), NotifiedType.LEFT);
 
 					var notInZone = true;
 					for (var zone : ConfigManager.getRedZones()) {
-						if (zone.contains(location.getBlockX(), location.getBlockZ())) {
+						if (zone.contains(location.getBlockX(), location.getBlockZ(), world)) {
 							notInZone = false;
 
 							// if hase invisibility take it
@@ -47,7 +48,7 @@ public class PlayerNotifier {
 					}
 
 					for (var zone : ConfigManager.getGreenZones()) {
-						if (zone.contains(location.getBlockX(), location.getBlockZ())) {
+						if (zone.contains(location.getBlockX(), location.getBlockZ(), world)) {
 							notInZone = false;
 							if (!notified.equals(NotifiedType.ENTERED_GREEN)) {
 								spigot.sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ConfigManager.getTranslation("entered-green")));

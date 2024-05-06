@@ -20,6 +20,7 @@ public class SaveCommand implements CommandExecutor {
 		}
 
 		var player = (Player) sender;
+		var world = player.getWorld().getEnvironment();
 
 		if (!player.hasPermission("ocgz.zones")) {
 			player.sendMessage(ConfigManager.getTranslation("no-permission"));
@@ -49,10 +50,10 @@ public class SaveCommand implements CommandExecutor {
 		var zone = args[0];
 
 		if (zone.equals("green")) {
-			ConfigManager.setGreenZone(first.get("x"), first.get("z"), second.get("x"), second.get("z"));
+			ConfigManager.setGreenZone(first.get("x"), first.get("z"), second.get("x"), second.get("z"), world);
 			player.sendMessage(ConfigManager.getTranslation("created-green"));
 		} else if (zone.equals("red")) {
-			ConfigManager.setRedZone(first.get("x"), first.get("z"), second.get("x"), second.get("z"));
+			ConfigManager.setRedZone(first.get("x"), first.get("z"), second.get("x"), second.get("z"), world);
 			player.sendMessage(ConfigManager.getTranslation("created-red"));
 		} else {
 			player.sendMessage(ConfigManager.getTranslation("wrong-type"));

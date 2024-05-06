@@ -1,28 +1,47 @@
 package ru.olejka.gamezonesplugin;
 
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.*;
 
-class ZoneDifinition {
-	private final Map<String, Integer> coordinates;
+class ZoneDefinition {
+	private final Map<String, String> definition;
+	private int x0, z0, x1, z1;
+	private World.Environment world;
 
-	public ZoneDifinition(int x0, int z0, int x1, int z1) {
-		this.coordinates = Map.of("x0", Math.min(x0, x1), "z0", Math.min(z0, z1), "x1", Math.max(x0, x1), "z1", Math.max(z0, z1));
+	public ZoneDefinition(int x0, int z0, int x1, int z1, World.Environment world) {
+		this.x0 = Math.min(x0, x1);
+		this.x1 = Math.max(x0, x1);
+		this.z0 = Math.min(z0, z1);
+		this.z1 = Math.max(z0, z1);
+		this.world = world;
+
+		this.definition = Map.of(
+			"x0", String.valueOf(this.x0),
+			"z0", String.valueOf(this.x1),
+			"x1", String.valueOf(this.z0),
+			"z1", String.valueOf(this.z1),
+			"world", world.toString()
+		);
 	}
 
-	public Map<String, Integer> getCoordinates() {
-		return coordinates;
+	public Map<String, String> getDefinition() {
+		return definition;
 	}
 
-	public boolean contains(int x, int z) {
-		return x >= coordinates.get("x0") && x <= coordinates.get("x1") && z >= coordinates.get("z0") && z <= coordinates.get("z1");
+	public boolean contains(int x, int z, World.Environment world) {
+		return x >= this.x0
+			&& x <= this.x1
+			&& z >= this.z0
+			&& z <= this.z1
+			&& world.equals(this.world);
 	}
 }
 
 public class ConfigManager {
-	private static final List<ZoneDifinition> greenZones = new ArrayList<>();
-	private static final List<ZoneDifinition> redZones = new ArrayList<>();
+	private static final List<ZoneDefinition> greenZones = new ArrayList<>();
+	private static final List<ZoneDefinition> redZones = new ArrayList<>();
 	private static final Map<String, String> translation = new HashMap<>();
 
 	public static void parseConfig(FileConfiguration config) {
@@ -30,10 +49,34 @@ public class ConfigManager {
 		redZones.clear();
 
 		for (var zone : config.getMapList("zones.green")) {
-			greenZones.add(new ZoneDifinition((int) zone.get("x0"), (int) zone.get("z0"), (int) zone.get("x1"), (int) zone.get("z1")));
+			var x0 = zone.get("x0");
+			var z0 = zone.get("z0");
+			var x1 = zone.get("x1");
+			var z1 = zone.get("z1");
+			var world = zone.get("world");
+
+			greenZones.add(new ZoneDefinition(
+				x0.getClass().equals(String.class) ? Integer.parseInt((String) x0) : (int) x0,
+				z0.getClass().equals(String.class) ? Integer.parseInt((String) z0) : (int) z0,
+				x1.getClass().equals(String.class) ? Integer.parseInt((String) x1) : (int) x1,
+				z1.getClass().equals(String.class) ? Integer.parseInt((String) z1) : (int) z1,
+				world != null ? World.Environment.valueOf((String) world) : World.Environment.NORMAL
+			));
 		}
 		for (var zone : config.getMapList("zones.red")) {
-			redZones.add(new ZoneDifinition((int) zone.get("x0"), (int) zone.get("z0"), (int) zone.get("x1"), (int) zone.get("z1")));
+			var x0 = zone.get("x0");
+			var z0 = zone.get("z0");
+			var x1 = zone.get("x1");
+			var z1 = zone.get("z1");
+			var world = zone.get("world");
+
+			redZones.add(new ZoneDefinition(
+				x0.getClass().equals(String.class) ? Integer.parseInt((String) x0) : (int) x0,
+				z0.getClass().equals(String.class) ? Integer.parseInt((String) z0) : (int) z0,
+				x1.getClass().equals(String.class) ? Integer.parseInt((String) x1) : (int) x1,
+				z1.getClass().equals(String.class) ? Integer.parseInt((String) z1) : (int) z1,
+				world != null ? World.Environment.valueOf((String) world) : World.Environment.NORMAL
+			));
 		}
 
 		for (var key : Objects.requireNonNull(config.getConfigurationSection("translation")).getKeys(false)) {
@@ -42,29 +85,29 @@ public class ConfigManager {
 	}
 
 	public static void saveConfig(FileConfiguration config) {
-		var greenList  = greenZones.stream().map(ZoneDifinition::getCoordinates).toList();
-		var redList  = redZones.stream().map(ZoneDifinition::getCoordinates).toList();
+		var greenList  = greenZones.stream().map(ZoneDefinition::getDefinition).toList();
+		var redList  = redZones.stream().map(ZoneDefinition::getDefinition).toList();
 		config.set("zones.green", greenList);
 		config.set("zones.red", redList);
 	}
 
-	public static void setGreenZone(int x0, int z0, int x1, int z1) {
-		greenZones.add(new ZoneDifinition(x0, z0, x1, z1));
+	public static void setGreenZone(int x0, int z0, int x1, int z1, World.Environment world) {
+		greenZones.add(new ZoneDefinition(x0, z0, x1, z1, world));
 	}
 
-	public static void setRedZone(int x0, int z0, int x1, int z1) {
-		redZones.add(new ZoneDifinition(x0, z0, x1, z1));
+	public static void setRedZone(int x0, int z0, int x1, int z1, World.Environment world) {
+		redZones.add(new ZoneDefinition(x0, z0, x1, z1, world));
 	}
 
-	public static boolean deleteZone(int x, int z) {
-		return greenZones.removeIf(zone -> zone.contains(x, z)) || redZones.removeIf(zone -> zone.contains(x, z));
+	public static boolean deleteZone(int x, int z, World.Environment world) {
+		return greenZones.removeIf(zone -> zone.contains(x, z, world)) || redZones.removeIf(zone -> zone.contains(x, z, world));
 	}
 
-	public static List<ZoneDifinition> getGreenZones() {
+	public static List<ZoneDefinition> getGreenZones() {
 		return greenZones;
 	}
 
-	public static List<ZoneDifinition> getRedZones() {
+	public static List<ZoneDefinition> getRedZones() {
 		return redZones;
 	}
 

@@ -20,6 +20,7 @@ public class DeleteCommand implements CommandExecutor {
 		}
 
 		var player = (Player) sender;
+		var world = player.getWorld().getEnvironment();
 		var location = player.getLocation();
 
 		if (!player.hasPermission("ocgz.zones")) {
@@ -27,7 +28,7 @@ public class DeleteCommand implements CommandExecutor {
 			return true;
 		}
 
-		var deleted = ConfigManager.deleteZone(location.getBlockX(), location.getBlockZ());
+		var deleted = ConfigManager.deleteZone(location.getBlockX(), location.getBlockZ(), world);
 
 		if (!deleted) {
 			player.sendMessage(ConfigManager.getTranslation("not-in-zone"));
