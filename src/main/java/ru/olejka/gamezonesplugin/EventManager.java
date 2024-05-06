@@ -46,24 +46,24 @@ public class EventManager implements Listener {
 	}
 
 	//Cancel burning damage only to players in green zones
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onEntityDamageByBlock(EntityDamageEvent event) {
-		if (event.getEntity() instanceof Player) {
-			var player = (Player) event.getEntity();
-			var cause = event.getCause();
-			var location = player.getLocation();
-			var world = Objects.requireNonNull(location.getWorld());
-
-			if (cause != EntityDamageEvent.DamageCause.FIRE && cause != EntityDamageEvent.DamageCause.FIRE_TICK && cause != EntityDamageEvent.DamageCause.LAVA)
-				return;
-
-			for (var zone : ConfigManager.getGreenZones()) {
-				if (zone.contains(location.getBlockX(), location.getBlockZ(), world.getEnvironment())) {
-					event.setCancelled(true);
-				}
-			}
-		}
-	}
+//	@EventHandler(priority = EventPriority.HIGHEST)
+//	public void onEntityDamageByBlock(EntityDamageEvent event) {
+//		if (event.getEntity() instanceof Player) {
+//			var player = (Player) event.getEntity();
+//			var cause = event.getCause();
+//			var location = player.getLocation();
+//			var world = Objects.requireNonNull(location.getWorld());
+//
+//			if (cause != EntityDamageEvent.DamageCause.FIRE && cause != EntityDamageEvent.DamageCause.FIRE_TICK && cause != EntityDamageEvent.DamageCause.LAVA)
+//				return;
+//
+//			for (var zone : ConfigManager.getGreenZones()) {
+//				if (zone.contains(location.getBlockX(), location.getBlockZ(), world.getEnvironment())) {
+//					event.setCancelled(true);
+//				}
+//			}
+//		}
+//	}
 
 	// Limit fire spread in green zone
 	@EventHandler(priority = EventPriority.HIGHEST)
