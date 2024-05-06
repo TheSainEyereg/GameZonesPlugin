@@ -12,15 +12,15 @@ class ZoneDefinition {
 
 	public ZoneDefinition(int x0, int z0, int x1, int z1, World.Environment world) {
 		this.x0 = Math.min(x0, x1);
-		this.x1 = Math.max(x0, x1);
 		this.z0 = Math.min(z0, z1);
+		this.x1 = Math.max(x0, x1);
 		this.z1 = Math.max(z0, z1);
 		this.world = world;
 
 		this.definition = Map.of(
 			"x0", String.valueOf(this.x0),
-			"z0", String.valueOf(this.x1),
-			"x1", String.valueOf(this.z0),
+			"z0", String.valueOf(this.z0),
+			"x1", String.valueOf(this.x1),
 			"z1", String.valueOf(this.z1),
 			"world", world.toString()
 		);
